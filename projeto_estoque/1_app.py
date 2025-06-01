@@ -1,22 +1,20 @@
 import streamlit as st
-import streamlit_authenticator as stauth
-from autenticacao.auth_main import login_2, logout, login_form, login
-
-
-COOKIE_EXPIRY_DAYS = 30
-
-def main():
-    authenticator = stauth.Authenticate(
-        {"usernames":{"teste":{"name": "Test User", "password": "test123"}}},
-        "random_cookie_name",
-        "random_signature_key",
-        COOKIE_EXPIRY_DAYS,
-    )
 
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
+
+def login_2():
+    if st.button("Log in"):
+        st.session_state.logged_in = True
+        st.rerun()
+
+
+def logout():
+    if st.button("Log out"):
+        st.session_state.logged_in = False
+        st.rerun()
 
 
 def configuracao_user():
@@ -51,7 +49,7 @@ gerenciar_produtos = st.Page("pages/Produtos/8_Gerenciar_Produtos.py", title="Ge
 
 
 
-if st.login_form.logged_in:
+if st.session_state.logged_in:
     logo = st.logo("images/EscritaLogoTechnova2.png", size="large")
     pg = st.navigation(
         {
