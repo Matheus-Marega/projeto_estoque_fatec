@@ -1,46 +1,27 @@
 import streamlit as st
-import random
-from datetime import datetime
+from database.queries import verificar_pratos_no_banco, verificar_info_utilizada_nos_pratos
 
-# Simula uma função que acessa o banco
-def buscar_produtos_db():
-    print("🔄 Consultando banco de dados...")
-    return [f"Produto {i}" for i in range(1, random.randint(3, 6))]
+# if "bt_editar_pratos" not in st.session_state:
+#     st.session_state["bt_editar_pratos"] = False
 
-# Wrapper com cache
-@st.cache_data
-def produtos_cache():
-    return buscar_produtos_db()
 
-# Inicializa os dados no session_state
-if "produtos_do_banco" not in st.session_state:
-    st.session_state["produtos_do_banco"] = produtos_cache()
-if "ingredientes" not in st.session_state:
-    st.session_state["ingredientes"] = []
-if "botao_clicado" not in st.session_state:
-    st.session_state["botao_clicado"] = False
+st.title("Gerenciar Pratos")
+botao_editar_pratos = st.button("Editar Pratos", key="bt_editar_pratos")
+if botao_editar_pratos:
+    st.text("Funcionalidade de edição de pratos ainda não implementada.")
 
-st.title("Cadastro de Prato")
 
-# Campo de seleção com base nos dados armazenados
-ingredientes = st.multiselect("Escolha os ingredientes:", st.session_state["produtos_do_banco"], key="ingredientes")
+st.divider()
 
-# Mostra seleção atual
-st.write("Ingredientes selecionados:", ingredientes)
-
-# Botão para atualizar produtos (limpa cache e refaz consulta)
-if st.button("🔁 Atualizar Produtos do Banco"):
-    st.cache_data.clear()
-    st.session_state["produtos_do_banco"] = produtos_cache()
-    st.success(f"Produtos atualizados às {datetime.now().strftime('%H:%M:%S')}")
-
-# Botão de cadastro (simula fluxo com estado)
-def marcar_botao():
-    st.session_state["botao_clicado"] = True
-
-st.button("✅ Cadastrar Prato", on_click=marcar_botao)
-
-# Executa o fluxo apenas se o botão for clicado
-if st.session_state["botao_clicado"]:
-    st.success(f"Prato cadastrado com: {st.session_state['ingredientes']}")
-    st.session_state["botao_clicado"] = False
+# if verificar_pratos_no_banco == []:
+#     st.error("Nenhum prato cadastrado no sistema")
+#     st.stop()
+# else:
+#     for pratos in verificar_pratos_no_banco():
+st.header(f"TESTE DE PRATO")
+st.subheader("Ingredientes utilizados:")
+produtos_no_prato = verificar_info_utilizada_nos_pratos("Prato de Teste")
+print(produtos_no_prato)
+for info in produtos_no_prato:
+    st.badge(f"*Nome do Produto*: {info[0][0]}           /          Quantidade Utilizada: {info[1][0]}           /          Unidade de Medida: {info[2][0]}",color="primary")
+    st.divider()

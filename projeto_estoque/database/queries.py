@@ -77,6 +77,24 @@ def verificar_se_produto_ja_existe_no_DB(nome_produto):
     else:
         return True
 
+def verificar_se_prato_ja_existe_no_DB(nome_prato):
+    connection = psycopg2.connect(database=DATABASE,host=HOST,user=USERSERVER,password=PASSWORD,port=PORT)
+    cursor = connection.cursor()
+    query = f"""
+        SELECT nome_prato FROM pratos WHERE nome_prato = %s
+        """
+    cursor.execute(query,(nome_prato,))
+    request = cursor.fetchone()
+    if(connection):
+        cursor.close()
+        connection.close()
+        print("Conexao com o banco de dados fechada.")
+        print(request)
+    if request == None:
+        return False
+    else:
+        return True
+
 
 def verificar_unidade_medida_produto(nome_produto):
     connection = psycopg2.connect(database=DATABASE,host=HOST,user=USERSERVER,password=PASSWORD,port=PORT)
@@ -208,14 +226,121 @@ def verificar_ingredientes_cadastrados_no_prato(nome_prato):
             FROM produtos 
             WHERE id = %s
             """
-        cursor.execute(query,(id,))
+        cursor.execute(query,(id))
         nome_do_produto_em_estoque = cursor.fetchone()
         lista_temporaria.append(nome_do_produto_em_estoque)
-        
+
     if(connection):
         cursor.close()
         connection.close()
         print("Conexao com o banco de dados fechada.")
+    return lista_temporaria
+
+def verificar_info_utilizada_nos_pratos(nome_prato):
+    connection = psycopg2.connect(database=DATABASE,host=HOST,user=USERSERVER,password=PASSWORD,port=PORT)
+    cursor = connection.cursor()
+    query = f"""
+        SELECT id 
+        FROM pratos 
+        WHERE nome_prato = %s
+        """
+    cursor.execute(query,(nome_prato,))
+    id_prato = cursor.fetchone()
+
+    query = f"""
+        SELECT ingrediente_id
+        FROM ingredientes_pratos 
+        WHERE prato_id = %s
+        """
+    cursor.execute(query,(id_prato,))
+    id_ingredientes = cursor.fetchall()
+    print(f"ID dos ingredientes: {id_ingredientes}")
+
+
+    lista_temporaria = []
+    for id in id_ingredientes:
+        query = f"""
+            SELECT nome_produto
+            FROM produtos 
+            WHERE id = %s
+            """
+        cursor.execute(query,(id))
+        nome_do_produto_em_estoque = cursor.fetchone()
+
+        query = f"""
+            SELECT quantidade_utilizada
+            FROM ingredientes_pratos
+            WHERE prato_id = %s and ingrediente_id = %s
+        """
+        cursor.execute(query,(id_prato,id))
+        quantidade_utilizada = cursor.fetchone()
+
+        query = f"""
+            SELECT unidade_medida_utilizada_no_prato
+            FROM ingredientes_pratos
+            WHERE prato_id = %s and ingrediente_id = %s
+        """
+        cursor.execute(query,(id_prato,id))
+        unidade_medida_utilizada_no_prato = cursor.fetchone()
+        lista_temporaria.append((nome_do_produto_em_estoque, quantidade_utilizada, unidade_medida_utilizada_no_prato))
+
+    if(connection):
+        cursor.close()
+        connection.close()
+    return lista_temporaria
+
+
+def verificar_info_cadastradas_nos_pratos(nome_prato):
+    connection = psycopg2.connect(database=DATABASE,host=HOST,user=USERSERVER,password=PASSWORD,port=PORT)
+    cursor = connection.cursor()
+    query = f"""
+        SELECT id 
+        FROM pratos 
+        WHERE nome_prato = %s
+        """
+    cursor.execute(query,(nome_prato,))
+    id_prato = cursor.fetchone()
+
+    query = f"""
+        SELECT ingrediente_id
+        FROM ingredientes_pratos 
+        WHERE prato_id = %s
+        """
+    cursor.execute(query,(id_prato,))
+    id_ingredientes = cursor.fetchall()
+    print(f"ID dos ingredientes: {id_ingredientes}")
+
+
+    lista_temporaria = []
+    for id in id_ingredientes:
+        query = f"""
+            SELECT nome_produto
+            FROM produtos 
+            WHERE id = %s
+            """
+        cursor.execute(query,(id))
+        nome_do_produto_em_estoque = cursor.fetchone()
+
+        query = f"""
+            SELECT quantidade_utilizada
+            FROM ingredientes_pratos
+            WHERE prato_id = %s and ingrediente_id = %s
+        """
+        cursor.execute(query,(id_prato,id))
+        quantidade_utilizada = cursor.fetchone()
+
+        query = f"""
+            SELECT unidade_medida_utilizada_no_prato
+            FROM ingredientes_pratos
+            WHERE prato_id = %s and ingrediente_id = %s
+        """
+        cursor.execute(query,(id_prato,id))
+        unidade_medida_utilizada_no_prato = cursor.fetchone()
+        lista_temporaria.append((nome_do_produto_em_estoque, quantidade_utilizada, unidade_medida_utilizada_no_prato))
+
+    if(connection):
+        cursor.close()
+        connection.close()
     return lista_temporaria
 
 def adiciona_qtd_produto(nome_produto,quantidade):
@@ -266,14 +391,14 @@ def cadastrar_usuarios_no_DB(nome, user, senha):
 
 
 
-def cadastrar_ingredientes_pratos(id_prato, ingredientes_id, quantidade_utilizada):
+def cadastrar_ingredientes_pratos(id_prato, ingredientes_id, quantidade_utilizada,unidade_medida_utilizada_no_prato):
     connection = psycopg2.connect(database=DATABASE,host=HOST,user=USERSERVER,password=PASSWORD,port=PORT)
     cursor = connection.cursor()
     query = f"""
-        INSERT INTO ingredientes_pratos (prato_id, ingrediente_id,quantidade_utilizada)
-        VALUES (%s, %s, %s)
+        INSERT INTO ingredientes_pratos (prato_id, ingrediente_id,quantidade_utilizada,unidade_medida_utilizada_no_prato)
+        VALUES (%s, %s, %s, %s)
         """
-    cursor.execute(query,(id_prato, ingredientes_id, quantidade_utilizada))
+    cursor.execute(query,(id_prato, ingredientes_id, quantidade_utilizada,unidade_medida_utilizada_no_prato))
     connection.commit()
     if(connection):
         cursor.close()
