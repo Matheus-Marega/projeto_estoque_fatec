@@ -1,28 +1,23 @@
+# import psycopg2
 
-from database.connection import instance_cursor
-from dotenv import load_dotenv
-import os
+# def testar_conexao():
+#     try:
+#         connection = psycopg2.connect(
+#             database="railway",
+#             host="postgres.railway.internal",
+#             user="postgres",
+#             password="MhRHzMMgcFyvznPGnPIHhyBpCLpwpJWw",
+#             port="5432"
+#         )
+#         cursor = connection.cursor()
+#         cursor.execute("SELECT 1;")
+#         resultado = cursor.fetchone()
+#         print("Conexão bem-sucedida!" if resultado[0] == 1 else "Falha na conexão.")
+#     except Exception as e:
+#         print(f"Erro ao conectar: {e}")
+#     finally:
+#         if 'connection' in locals() and connection:
+#             cursor.close()
+#             connection.close()
 
-load_dotenv()
-
-DATABASE = os.getenv("DATABASE")
-HOST = os.getenv("HOST")
-USERSERVER = os.getenv("USERSERVER")
-PASSWORD = os.getenv("PASSWORD")
-PORT = os.getenv("PORT")
-
-
-def testar_conexao():
-    try:
-        with instance_cursor() as cursor:
-            cursor.execute("SELECT 1;")
-            resultado = cursor.fetchone()
-            if resultado and resultado[0] == 1:
-                print("Conexão ao banco de dados bem-sucedida!")
-            else:
-                print("Conexão falhou.")
-    except Exception as e:
-        print(f"Erro ao conectar: {e}")
-
-
-testar_conexao()
+# testar_conexao()

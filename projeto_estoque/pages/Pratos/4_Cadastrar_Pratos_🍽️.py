@@ -1,11 +1,11 @@
 import streamlit as st
-from pages.Produtos.Funcao_produtos.registrar_entrada_produtos import verificar_produtos_do_banco as buscar_produtos_db
+from pages.Produtos.Funcao_produtos.registrar_entrada_produtos import verificar_produtos
 from pages.Pratos.funcao_pratos.cadastro_qtd_ingredientes import cadastrar_pratos
 
 # ⚙️ Função cacheada
 @st.cache_data
 def produtos_cache():
-    return buscar_produtos_db()
+    return verificar_produtos()
 
 # ⏳ Inicialização do estado
 if "produtos_do_banco" not in st.session_state:

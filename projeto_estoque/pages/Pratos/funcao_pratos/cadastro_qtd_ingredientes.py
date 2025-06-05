@@ -1,6 +1,6 @@
 import streamlit as st
 from database.models import criar_tabela_cadastro_pratos, criar_tabela_ingredientes_pratos
-from database.queries import cadastra_pratos_no_DB, cadastrar_ingredientes_pratos, buscar_ID_prato, buscar_ID_ingredientes, verificar_unidade_medida_produto, verificar_marca_do_produto
+from database.queries import cadastra_pratos_no_DB, cadastrar_ingredientes_pratos,verificar_se_prato_ja_existe_no_DB, buscar_ID_prato, buscar_ID_ingredientes, verificar_unidade_medida_produto, verificar_marca_do_produto
 from pages.funcao_uteis.validacoes import validar_unidade_de_medida_nos_campos_de_texto
 from time import sleep
 
@@ -49,22 +49,26 @@ def cadastrar_pratos():
 
 
     if st.button("Cadastrar Prato"):
-        cadastra_pratos_no_DB(
-            st.session_state['nome_prato'],
-            st.session_state['categoria_prato']
-        )
-        for ingrediente in lista_ingredientes:
-            cadastrar_ingredientes_pratos(
-                buscar_ID_prato(st.session_state['nome_prato'])[0],
-                buscar_ID_ingredientes(ingrediente)[0],
-                st.session_state[f"quantidade_{ingrediente}"]
+        if verificar_se_prato_ja_existe_no_DB(st.session_state['nome_prato']):
+                st.error("Prato de mesmo nome já cadastrado!")
+        else:
+            cadastra_pratos_no_DB(
+                st.session_state['nome_prato'],
+                st.session_state['categoria_prato'],
             )
-        
-        st.success("Prato cadastrado com sucesso!")
-        sleep(2)
-        # Agora sim, limpe o estado se quiser reiniciar o fluxo
-        del st.session_state['etapa_cadastro']
-        del st.session_state['nome_prato']
-        del st.session_state['ingredientes']
-        del st.session_state['categoria_prato']
-        st.rerun()
+            for ingrediente in lista_ingredientes:
+                cadastrar_ingredientes_pratos(
+                    buscar_ID_prato(st.session_state['nome_prato'])[0],
+                    buscar_ID_ingredientes(ingrediente)[0],
+                    st.session_state[f"quantidade_{ingrediente}"],
+                    st.session_state[f"unidade_media_{ingrediente}"]
+                )
+            
+            st.success("Prato cadastrado com sucesso!")
+            sleep(2)
+            # Agora sim, limpe o estado se quiser reiniciar o fluxo
+            del st.session_state['etapa_cadastro']
+            del st.session_state['nome_prato']
+            del st.session_state['ingredientes']
+            del st.session_state['categoria_prato']
+            st.rerun()
