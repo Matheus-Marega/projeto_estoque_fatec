@@ -1,3 +1,4 @@
 streamlit == 1.44.1
 psycopg2
 dotenv
+streamlit authenticator
