@@ -1,5 +1,6 @@
-
 import streamlit as st
+from autenticacao.auth_main import main as auth_main_login
+
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -14,6 +15,8 @@ def login_2():
 def logout():
     if st.button("Log out"):
         st.session_state.logged_in = False
+        st.session_state.user = None
+        st.session_state.name = None
         st.rerun()
 
 
@@ -49,7 +52,9 @@ gerenciar_produtos = st.Page("pages/Produtos/8_Gerenciar_Produtos.py", title="Ge
 relatorio_visao_geral = st.Page(
     "pages/Relatorios/relatorio_visao_geral.py", title="Relatório de Visão Geral")
 
-if st.session_state.logged_in:
+if not st.session_state.logged_in:
+    auth_main_login()
+else:
     logo = st.logo("images/EscritaLogoTechnova2.png", size="large")
     pg = st.navigation(
         {
@@ -60,7 +65,4 @@ if st.session_state.logged_in:
             
         }
     )
-else:
-    pg = st.navigation([login_page])
-
-pg.run()
+    pg.run()
