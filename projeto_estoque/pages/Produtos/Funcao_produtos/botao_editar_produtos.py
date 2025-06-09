@@ -1,10 +1,10 @@
 import streamlit as st
-from database.queries import verificar_info_produtos, atualizar_produto
+from database.queries import verificar_info_produtos, atualizar_produto,verificar_produtos
 from pages.Produtos.Funcao_produtos.registrar_entrada_produtos import verificar_produtos_do_banco
 
 @st.cache_data
 def produtos_cache():
-    return verificar_produtos_do_banco()
+    return verificar_produtos()
 
 @st.dialog("Alterar Produto")
 def editar_produtos_do_estoque():

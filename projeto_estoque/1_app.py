@@ -1,6 +1,5 @@
+import streamlit_authenticator as stauth
 import streamlit as st
-from autenticacao.auth_main import main as auth_main_login
-
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -11,12 +10,38 @@ def login_2():
         st.session_state.logged_in = True
         st.rerun()
 
+def login_form(authenticator):
+    name, authentication_status, username = authenticator.login('Login')
+    if authentication_status:
+        authenticator.logout('Logout', 'main')
+        logo = st.logo("images/EscritaLogoTechnova2.png", size="large")
+        pg = st.navigation(
+            {
+                "Produtos": [cadastrar_produtos, registrar_entrada_produtos, gerenciar_produtos],
+                "Pratos": [cadastrar_pratos, registrar_saida_pratos, gerenciar_pratos],
+                "Relatórios": [relatorio_visao_geral],
+                "Account": [logout_page,config,dev_config_pg],
+                
+            }
+        )
+    elif authentication_status == False:
+        st.error('Usuário ou senha incorretos')
+    elif authentication_status == None:
+        st.warning('Insira um nome de usuário e uma senha')
+
+    
+
+
+    
+        clicou_em_registrar = st.button("Registrar")
+        if clicou_em_registrar:
+            st.session_state['clicou_registrar'] = True
+            st.rerun()
+
 
 def logout():
     if st.button("Log out"):
         st.session_state.logged_in = False
-        st.session_state.user = None
-        st.session_state.name = None
         st.rerun()
 
 
@@ -52,9 +77,7 @@ gerenciar_produtos = st.Page("pages/Produtos/8_Gerenciar_Produtos.py", title="Ge
 relatorio_visao_geral = st.Page(
     "pages/Relatorios/relatorio_visao_geral.py", title="Relatório de Visão Geral")
 
-if not st.session_state.logged_in:
-    auth_main_login()
-else:
+if st.session_state.logged_in:
     logo = st.logo("images/EscritaLogoTechnova2.png", size="large")
     pg = st.navigation(
         {
@@ -65,4 +88,7 @@ else:
             
         }
     )
-    pg.run()
+else:
+    pg = st.navigation([login_page])
+
+pg.run()

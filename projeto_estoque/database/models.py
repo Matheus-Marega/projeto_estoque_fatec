@@ -78,7 +78,7 @@ def criar_tabela_ingredientes_pratos():
         print("Conexao com o banco de dados fechada.")
 
 
-def criar_tabela():
+def cria_tabela_usuarios():
     connection = psycopg2.connect(database=DATABASE, host=HOST, user=USERSERVER, password=PASSWORD, port=PORT)
     cursor = connection.cursor()
     query= f'''

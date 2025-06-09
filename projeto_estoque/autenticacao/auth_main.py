@@ -1,14 +1,14 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 from database.queries import cadastrar_usuarios_no_DB, consultar_todos_usuarios, consultar_usuario_no_DB
-from database.models import criar_tabela
+from database.models import criar_tabela_registros
 from time import sleep
 
 def main():
     try:
         consultar_todos_usuarios()
     except:
-        criar_tabela()
+        criar_tabela_registros()
 
     db_query = consultar_todos_usuarios()
 
@@ -33,21 +33,7 @@ def main():
         usuario_form()
 
 
-def login_form(authenticator):
-    name, authentication_status, username = authenticator.login('Login')
-    if authentication_status:
-        st.session_state.logged_in = True
-        st.session_state.user = username
-        st.session_state.name = name
-        st.rerun()
-    elif authentication_status == False:
-        st.error('Usuário ou senha incorretos')
-    elif authentication_status == None:
-        st.warning('Insira um nome de usuário e uma senha')
-        clicou_em_registrar = st.button("Registrar")
-        if clicou_em_registrar:
-            st.session_state['clicou_registrar'] = True
-            st.rerun()
+
 
 
 def confirmation_msg():
